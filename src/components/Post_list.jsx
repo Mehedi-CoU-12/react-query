@@ -29,7 +29,7 @@ function Post_list() {
         error: postError,
         reset,
     } = useMutation({
-        queryFn: addPost,
+        mutationFn: addPost,
     });
 
     const handleClick = (e) => {
@@ -38,10 +38,12 @@ function Post_list() {
         const formData = new FormData(e.target);
         const title = formData.get("title");
         const tags = Array.from(formData.keys()).filter(
-            (key) => formData.get(key) === "on"
+            (key) => formData.get(key) === "on",
         );
 
         if (!title || !tags) return;
+
+        console.log("Form Data:", { title, tags });
 
         mutate({ id: postData.length + 1, title, tags });
 
@@ -51,7 +53,14 @@ function Post_list() {
     if (isLoading || isTagLoading) return <div>Loading....</div>;
 
     return (
-        <>
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+            }}
+        >
             <div>
                 {isTagLoading && <div>Loading...</div>}
                 {isTagError && <div>{tagError?.message}</div>}
@@ -60,8 +69,17 @@ function Post_list() {
                         type="text"
                         placeholder="enter your post..."
                         name="title"
+                        style={{
+                            marginTop: "10px",
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "10px",
+                            marginBottom: "10px",
+                            paddingLeft: "10px",
+                            font: "menu",
+                        }}
                     />
-                    <div>
+                    <div style={{display:'flex'}}>
                         {tagData.map((tag) => (
                             <div key={tag}>
                                 <input type="checkbox" id={tag} name={tag} />
@@ -69,7 +87,19 @@ function Post_list() {
                             </div>
                         ))}
                     </div>
-                    <button style={{ marginTop: "10px" }}>Create Post</button>
+                    <button
+                        style={{
+                            marginTop: "10px",
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "10px",
+                            textAlign: "center",
+                            font: "menu",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Create Post
+                    </button>
                 </form>
             </div>
             <h1>Post List</h1>
@@ -77,8 +107,15 @@ function Post_list() {
                 {isLoading && <div>Loading...</div>}
                 {isError && <div>{error?.message}</div>}
                 {postData && (
-                    <div>
-                        {postData.map((post) => {
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexDirection: "column",
+                        }}
+                    >
+                        {postData.map((post, index) => {
                             return (
                                 <div
                                     style={{
@@ -95,6 +132,8 @@ function Post_list() {
                                             marginRight: "10px",
                                         }}
                                     >
+                                        {index + 1}
+                                        {"."}
                                         {post.title}
                                     </span>
 
@@ -119,7 +158,7 @@ function Post_list() {
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
 
