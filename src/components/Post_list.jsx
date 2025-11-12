@@ -1,7 +1,8 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addPost, fetchPosts, fetchTags } from "../api/api";
 
 function Post_list() {
+    //fetch posts
     const {
         data: postData,
         isLoading,
@@ -12,6 +13,7 @@ function Post_list() {
         queryFn: fetchPosts,
     });
 
+    //fetch tags
     const {
         data: tagData,
         isLoading: isTagLoading,
@@ -22,6 +24,9 @@ function Post_list() {
         queryFn: fetchTags,
     });
 
+    const queryClient = useQueryClient();
+
+    //mutation to add post
     const {
         mutate,
         isError: isPostError,
@@ -30,6 +35,17 @@ function Post_list() {
         reset,
     } = useMutation({
         mutationFn: addPost,
+        // onMutate: () => {
+        //     console.log("Adding post...");
+        // },
+        onSuccess: (data, variables, context) => {
+            console.log("Post added successfully:", data);
+            console.log("Variables:", variables);
+            console.log("Context:", context);
+            queryClient.invalidateQueries({
+                queryKey: ["posts"],
+            });
+        },
     });
 
     const handleClick = (e) => {
@@ -38,7 +54,7 @@ function Post_list() {
         const formData = new FormData(e.target);
         const title = formData.get("title");
         const tags = Array.from(formData.keys()).filter(
-            (key) => formData.get(key) === "on",
+            (key) => formData.get(key) === "on"
         );
 
         if (!title || !tags) return;
@@ -79,7 +95,7 @@ function Post_list() {
                             font: "menu",
                         }}
                     />
-                    <div style={{display:'flex'}}>
+                    <div style={{ display: "flex" }}>
                         {tagData.map((tag) => (
                             <div key={tag}>
                                 <input type="checkbox" id={tag} name={tag} />
